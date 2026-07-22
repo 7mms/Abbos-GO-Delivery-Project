@@ -3,293 +3,375 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-translate="page_title">Abbos Go — Yetkazib berish xizmati</title>
+    <title>Abbos Go — Yetkazib berish xizmati</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Шрифт Inter и иконки FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- Toast уведомление -->
-    <div class="toast" data-translate="toast_added">Mahsulot savatga qo'shildi! 🛒</div>
+    <!-- Всплывающее уведомление (Toast) -->
+    <div id="toast" class="toast">Mahsulot savatga qo'shildi! 🛒</div>
 
-    <!-- ШАПКА -->
+    <!-- Шапка (Header) -->
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <div class="logo-container">
-                    <img src="images/abbosgologo.png" alt="Abbos Go" class="logo" onerror="this.style.display='none'">
-                    <span class="logo-text">Abbos<span class="logo-highlight">Go</span></span>
-                </div>
-                <div class="location">
+                <!-- Логотип: клик сбрасывает всё и ведет на главную -->
+                <a href="#" class="logo-container" onclick="goToHome(); return false;">
+                    <img src="images/abboslogo.svg" alt="Abbos Go Logo" class="logo">
+                    <span class="logo-text">Abbos <span class="logo-highlight">Go</span></span>
+                </a>
+                
+                <div class="location" onclick="showToast(translations[currentLang].locToast)">
                     <i class="fa-solid fa-location-dot loc-icon"></i>
-                    <span data-translate="location">Qorasuv</span>
+                    <span id="loc-text">Qorasuv</span>
                 </div>
             </div>
 
+            <!-- Каталог кнопка и Поиск для ПК -->
             <div class="header-center">
-                <button class="btn-catalog" data-translate="catalog_btn">
-                    <i class="fa-solid fa-bars"></i>
-                    Katalog
+                <button class="btn-catalog" onclick="scrollToSection('categories-section')">
+                    <i class="fa-solid fa-bars"></i> <span id="cat-btn-text">Katalog</span>
                 </button>
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" data-translate-placeholder="search_placeholder" placeholder="Mahsulotlarni qidirish...">
+                    <input type="text" id="search-input" placeholder="Mahsulotlarni qidirish...">
                 </div>
             </div>
 
+            <!-- Навигация и кнопки справа -->
             <div class="header-right">
                 <nav class="desktop-nav">
-                    <a href="#" data-translate="nav_promo">Aksiya</a>
-                    <a href="#" data-translate="nav_about">Biz haqimizda</a>
-                    <a href="#" data-translate="nav_contacts">Kontaktlar</a>
+                    <a href="#" id="nav-promo" onclick="filterByPromo(); return false;">Aksiya</a>
+                    <a href="#" id="nav-about" onclick="openInfoModal('about'); return false;">Biz haqimizda</a>
+                    <a href="#" id="nav-contact" onclick="openInfoModal('contact'); return false;">Kontaktlar</a>
                 </nav>
-                <button class="btn-login" id="open-login-modal" data-translate="login_btn">
-                    <i class="fa-regular fa-user"></i>
-                    Kirish
+                <button class="btn-login" id="btn-login" onclick="openAuthModal()">
+                    <i class="fa-regular fa-user"></i> <span id="login-text">Kirish</span>
                 </button>
-                <div class="lang-switcher">
-                    <button class="lang-item active" data-lang="uz">🇺🇿 UZ</button>
-                    <button class="lang-item" data-lang="ru">🇷🇺 RU</button>
+                <div class="cart-btn" id="cart-btn" onclick="toggleCart()">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
                 </div>
-                <div class="cart-btn" id="open-cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="cart-badge" style="display:none;">0</span>
+                <!-- Переключатель языка -->
+                <div class="lang-switcher">
+                    <button id="lang-uz" class="lang-item active" onclick="setLang('uz')">🇺🇿 UZ</button>
+                    <button id="lang-ru" class="lang-item" onclick="setLang('ru')">🇷🇺 RU</button>
                 </div>
             </div>
         </div>
-
-        <!-- Мобильный поиск -->
+        <!-- Поиск для телефона -->
         <div class="mobile-search">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" data-translate-placeholder="search_placeholder" placeholder="Qidirish...">
+                <input type="text" id="mobile-search-input" placeholder="Mahsulotlarni qidirish...">
             </div>
         </div>
     </header>
 
-    <!-- ГЛАВНЫЙ БАННЕР (ПК) -->
+    <!-- Главный баннер (ПК версия) -->
     <section class="hero-desktop">
         <div class="hero-content">
-            <h1 data-translate="hero_title">Yangi mahsulotlar to'g'ridan-to'g'ri Abbos bozoridan</h1>
-            <p data-translate="hero_subtitle">20-40 daqiqada yetkazib berish Qorasuvda</p>
+            <h1 id="desktop-hero-title">Yangi mahsulotlar to'g'ridan-to'g'ri Abbos bozoridan</h1>
+            <p id="desktop-hero-sub">20-40 daqiqada yetkazib berish Qorasuvda</p>
             <div class="hero-buttons">
-                <button class="btn-order" data-translate="btn_order">Buyurtma</button>
-                <button class="btn-view-cat" data-translate="btn_view_catalog">Katalogni ko'rish</button>
+                <button class="btn-order" id="btn-order" onclick="scrollToSection('products-section')">Buyurtma</button>
+                <button class="btn-view-cat" id="btn-view-cat" onclick="scrollToSection('categories-section')">Katalogni ko'rish</button>
             </div>
         </div>
+        
+        <!-- Корзина продуктов -->
         <div class="hero-image-wrapper">
-            <img src="images/Shopping-basket.png" alt="Savat" class="floating-basket" onerror="this.src='images/Shopping-basket.png'">
             <div class="badge-floating">
-                <span><span class="green-dot"></span> <span data-translate="badge_always_new">Har doim yangi</span></span>
-                <strong data-translate="badge_abbos_market">Bevosita Abbos Market</strong>
+                <span class="green-dot"></span>
+                <div>
+                    <strong id="badge-title">Har doim yangi</strong>
+                    <span id="badge-sub">Bevosita Abbos Market</span>
+                </div>
             </div>
+            <img src="images/Shopping-basket.png" alt="Basket" class="floating-basket">
         </div>
     </section>
 
-    <!-- ГЛАВНЫЙ БАННЕР (Мобильный) -->
-    <section class="hero-mobile">
-        <div class="hero-mobile-content">
-            <h2 data-translate="mobile_hero_time">10-20 daqiqada yetkazib berish</h2>
-            <span data-translate="mobile_hero_fast">tez yetkazib berish</span>
-            <br><br>
-            <button class="btn-mobile-view" data-translate="btn_view_catalog">Katalogni ko'rish</button>
-        </div>
-        <img src="images/Shopping-basket.png" alt="">
-    </section>
-
-    <!-- ПАНЕЛЬ ДОВЕРИЯ -->
+    <!-- Нижняя плашка преимуществ для ПК -->
     <section class="trust-bar">
         <div class="trust-item">
-            <div class="trust-icon green"><i class="fa-solid fa-bolt"></i></div>
+            <div class="trust-icon"><i class="fa-regular fa-clock"></i></div>
             <div>
-                <strong data-translate="trust_time">10-20 daqiqa</strong>
-                <span data-translate="trust_fast_delivery">tez yetkazib berish</span>
+                <strong id="trust-1-title">10-20 daqiqa</strong>
+                <span id="trust-1-sub">tez yetkazib berish</span>
             </div>
         </div>
         <div class="trust-item">
-            <div class="trust-icon orange"><i class="fa-solid fa-star"></i></div>
+            <div class="trust-icon orange"><i class="fa-regular fa-star"></i></div>
             <div>
                 <strong>4.9</strong>
-                <span data-translate="trust_rating">xizmat ko'rsatish reytingi</span>
+                <span id="trust-2-sub">xizmat ko'rsatish reytingi</span>
             </div>
         </div>
         <div class="trust-item">
-            <div class="trust-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="trust-icon green"><i class="fa-regular fa-file-lines"></i></div>
             <div>
-                <strong data-translate="trust_clients">5000+</strong>
-                <span data-translate="trust_happy">mamnun mijozlar</span>
+                <strong>5000+</strong>
+                <span id="trust-3-sub">mamnun mijozlar</span>
             </div>
         </div>
     </section>
 
-    <!-- КАТЕГОРИИ -->
-    <section class="section-container">
+    <!-- Главный баннер (Мобильная версия) -->
+    <section class="hero-mobile">
+        <div class="hero-mobile-content">
+            <h2 id="mobile-hero-title">Hafta chegirmalari<br><span>-30% gacha</span></h2>
+            <button class="btn-mobile-view" id="mobile-hero-btn" onclick="filterByPromo()">Ko'rish</button>
+        </div>
+        <img src="images/Shopping-basket.png" alt="Basket">
+    </section>
+
+    <!-- Категории (Tavsiya etamiz) -->
+    <section class="section-container" id="categories-section">
         <div class="section-header">
-            <h2 data-translate="discounts_title">Hafta chegirmalari -30% gacha</h2>
-            <a class="view-all" href="#" data-translate="view_all">Barchasini ko'rsatish</a>
+            <h2 id="cats-title">Tavsiya etamiz</h2>
+            <a href="#" class="view-all" id="reset-cat-link" onclick="goToHome(); return false;" style="display: none;">Barchasini ko'rsatish</a>
         </div>
-        <div class="categories-grid">
-            <div class="cat-card active" data-category="all">
-                <img src="images/Shopping-basket.png" alt="Все">
-                <span data-translate="cat_all">Barchasi</span>
-            </div>
-            <div class="cat-card" data-category="meat_department">
-                <img src="images/beef.png" alt="Мясо">
-                <span data-translate="cat_meat">Go'sht</span>
-            </div>
-            <div class="cat-card" data-category="vegetables">
-                <img src="images/vegetables.png" alt="Овощи">
-                <span data-translate="cat_vegetables">Sabzavotlar</span>
-            </div>
-            <div class="cat-card" data-category="fruits">
-                <img src="images/fruits.png" alt="Фрукты">
-                <span data-translate="cat_fruits">Mevalar</span>
-            </div>
-            <div class="cat-card" data-category="drinks">
-                <img src="images/drinks.png" alt="Напитки">
-                <span data-translate="cat_drinks">Ichimliklar</span>
-            </div>
-            <div class="cat-card" data-category="bakery">
-                <img src="images/bread.png" alt="Выпечка">
-                <span data-translate="cat_bakery">Nonushta</span>
-            </div>
-            <div class="cat-card" data-category="sweets">
-                <img src="images/cake.png" alt="Сладости">
-                <span data-translate="cat_sweets">Shirinliklar</span>
-            </div>
-            <div class="cat-card" data-category="cosmetics">
-                <img src="images/cosmetics.png" alt="Косметика">
-                <span data-translate="cat_cosmetics">Kosmetika</span>
-            </div>
-            <div class="cat-card" data-category="household">
-                <img src="images/cereal.png" alt="Бытовые">
-                <span data-translate="cat_household">Maishiy</span>
-            </div>
-            <div class="cat-card" data-category="others">
-                <img src="images/conserve.png" alt="Другое">
-                <span data-translate="cat_others">Boshqa</span>
-            </div>
+        <div class="categories-grid" id="categories-grid">
+            <!-- Категории вставятся через JS -->
         </div>
     </section>
 
-    <!-- ТОВАРЫ -->
-    <section class="section-container">
+    <!-- Популярные товары -->
+    <section class="section-container" id="products-section">
         <div class="section-header">
-            <h2 data-translate="recommend_title">Tavsiya etamiz</h2>
-            <a class="view-all" href="#" data-translate="view_all">Barchasini ko'rsatish</a>
+            <h2 id="products-title">Arzon narxlar kafolati</h2>
+            <a href="#" class="view-all" id="view-all-link" onclick="goToHome(); return false;">Barchasini ko'rish ></a>
         </div>
-        <div class="products-grid">
-            <!-- Товары вставляются через JS -->
+        <div class="products-grid" id="products-grid">
+            <!-- Товары вставятся через JS -->
         </div>
     </section>
 
-    <!-- БАННЕР ДОСТАВКИ -->
+    <!-- Баннер доставки с курьером -->
     <section class="delivery-banner">
         <div class="delivery-text">
-            <h3 data-translate="delivery_title">Arzon narxlar kafolati</h3>
-            <p data-translate="delivery_subtitle">10-20 daqiqada yetkazib berish — Tez, oson va qulay!</p>
+            <h3 id="deliv-title">10-20 daqiqada yetkazib berish</h3>
+            <p id="deliv-sub">Tez, oson va qulay!</p>
         </div>
-        <div class="scooter-circle">
-            <i class="fa-solid fa-motorcycle scooter-icon"></i>
+        <div class="delivery-items">
+            <div class="scooter-circle">
+                <i class="fa-solid fa-motorcycle scooter-icon"></i>
+            </div>
         </div>
-        <a href="#" class="view-all" data-translate="view_all_link">Barchasini ko'rish ></a>
     </section>
 
-    <!-- КОРЗИНА (Drawer) -->
-    <div class="cart-overlay"></div>
-    <aside class="cart-drawer">
+    <!-- Выезжающая панель корзины (Справа) -->
+    <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+    <div class="cart-drawer" id="cart-drawer">
         <div class="cart-header">
-            <h3 data-translate="cart_title">Sizning savatingiz</h3>
-            <button class="close-cart">×</button>
+            <h3 id="cart-drawer-title">Sizning savatingiz</h3>
+            <button class="close-cart" onclick="toggleCart()">&times;</button>
         </div>
-        <div class="cart-items">
-            <p style="text-align:center;color:#64748b;padding:40px 0;" data-translate="cart_empty">Savat bo'sh</p>
+        <div class="cart-items" id="cart-items">
+            <!-- Товары в корзине -->
         </div>
         <div class="cart-footer">
             <div class="total-row">
-                <span data-translate="cart_total">Jami:</span>
-                <span>0 so'm</span>
+                <span id="total-text">Jami:</span>
+                <strong id="cart-total">0 so'm</strong>
             </div>
-            <div class="profit-calc">
-                <span data-translate="cart_profit">⚡ Sizning foydangiz (6% + 15k):</span>
-                <span>0 so'm</span>
+            <!-- Секретный блок для расчета прибыли -->
+            <div class="profit-calc" title="Только для тебя :)">
+                <span>⚡ Sizning foydangiz (6% + 15k):</span>
+                <strong id="my-profit">0 so'm</strong>
             </div>
-            <button class="btn-checkout" data-translate="cart_checkout">Buyurtma berish</button>
-        </div>
-    </aside>
-
-    <!-- МОДАЛЬНОЕ ОКНО ВХОДА/РЕГИСТРАЦИИ -->
-    <div class="modal-overlay" id="auth-modal">
-        <div class="modal-box">
-            <button class="close-modal" id="close-auth-modal">×</button>
-            <div class="modal-tabs">
-                <button class="tab-btn active" data-tab="login" data-translate="modal_login">Kirish</button>
-                <button class="tab-btn" data-tab="register" data-translate="modal_register">Ro'yxatdan o'tish</button>
-            </div>
-
-            <!-- Форма входа -->
-            <form id="login-form">
-                <div class="input-group">
-                    <label data-translate="label_phone">Telefon raqam</label>
-                    <input type="tel" data-translate-placeholder="placeholder_phone" placeholder="+998 __ ___ __ __" required>
-                </div>
-                <div class="input-group">
-                    <label data-translate="label_password">Parol</label>
-                    <input type="password" data-translate-placeholder="placeholder_password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-auth-submit" data-translate="btn_login_submit">Tizimga kirish</button>
-            </form>
-
-            <!-- Форма регистрации -->
-            <form id="register-form" style="display:none;">
-                <div class="input-group">
-                    <label data-translate="label_name">Ismingiz</label>
-                    <input type="text" data-translate-placeholder="placeholder_name" placeholder="Ismingiz" required>
-                </div>
-                <div class="input-group">
-                    <label data-translate="label_phone">Telefon raqam</label>
-                    <input type="tel" data-translate-placeholder="placeholder_phone" placeholder="+998 __ ___ __ __" required>
-                </div>
-                <div class="input-group">
-                    <label data-translate="label_new_password">Parol o'ylab toping</label>
-                    <input type="password" data-translate-placeholder="placeholder_password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-auth-submit" data-translate="btn_register_submit">Ro'yxatdan o'tish</button>
-            </form>
+            <button class="btn-checkout" id="btn-checkout" onclick="openCheckoutModal()">Buyurtma berish</button>
         </div>
     </div>
 
-    <!-- МОБИЛЬНАЯ НИЖНЯЯ НАВИГАЦИЯ -->
+    <!-- Модальное окно авторизации и регистрации -->
+    <div class="modal-overlay" id="auth-modal-overlay" onclick="closeAuthModal()"></div>
+    <div class="modal-box" id="auth-modal">
+        <button class="close-modal" onclick="closeAuthModal()">&times;</button>
+        <div class="modal-tabs">
+            <button class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Kirish</button>
+            <button class="tab-btn" id="tab-register" onclick="switchAuthTab('register')">Ro'yxatdan o'tish</button>
+        </div>
+        
+        <!-- Форма Входа -->
+        <form id="form-login" class="auth-form" onsubmit="handleAuth(event, 'login')">
+            <div class="input-group">
+                <label id="lbl-login-phone">Telefon raqam</label>
+                <input type="tel" placeholder="+998 90 123 45 67" required>
+            </div>
+            <div class="input-group">
+                <label id="lbl-login-pass">Parol</label>
+                <input type="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-auth-submit" id="btn-submit-login">Tizimga kirish</button>
+        </form>
+
+        <!-- Форма Регистрации -->
+        <form id="form-register" class="auth-form" style="display: none;" onsubmit="handleAuth(event, 'register')">
+            <div class="input-group">
+                <label id="lbl-reg-name">Ismingiz</label>
+                <input type="text" id="reg-name-input" placeholder="Abbos" required>
+            </div>
+            <div class="input-group">
+                <label id="lbl-reg-phone">Telefon raqam</label>
+                <input type="tel" placeholder="+998 90 123 45 67" required>
+            </div>
+            <div class="input-group">
+                <label id="lbl-reg-pass">Parol o'ylab toping</label>
+                <input type="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-auth-submit" id="btn-submit-reg">Ro'yxatdan o'tish</button>
+        </form>
+    </div>
+
+    <!-- Модальное окно информации (Biz haqimizda / Kontaktlar) -->
+    <div class="modal-overlay" id="info-modal-overlay" onclick="closeInfoModal()"></div>
+    <div class="modal-box info-modal-box" id="info-modal">
+        <button class="close-modal" onclick="closeInfoModal()">&times;</button>
+        <h3 id="info-modal-title" style="margin-bottom: 15px; color: var(--green-dark);">Ma'lumot</h3>
+        <div id="info-modal-content" style="line-height: 1.6; color: var(--text-main);"></div>
+    </div>
+
+    <!-- Мобильная нижняя панель навигации -->
     <nav class="mobile-bottom-nav">
-        <a href="#" class="nav-item active">
+        <a href="#" class="nav-item active" id="nav-btn-home" onclick="goToHome(); return false;">
             <i class="fa-solid fa-house"></i>
-            <span data-translate="nav_main">Asosiy</span>
+            <span id="bot-home">Asosiy</span>
         </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-grip"></i>
-            <span data-translate="nav_catalog">Katalog</span>
+        <a href="#" class="nav-item" id="nav-btn-cat" onclick="scrollToSection('categories-section'); return false;">
+            <i class="fa-solid fa-book-open"></i>
+            <span id="bot-cat">Katalog</span>
         </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-heart"></i>
-            <span data-translate="nav_favorites">Saralangan</span>
+        <a href="#" class="nav-item" id="nav-btn-fav" onclick="filterByFavorites(); return false;">
+            <i class="fa-regular fa-heart"></i>
+            <span id="bot-fav">Saralangan</span>
         </a>
-        <a href="#" class="nav-item bot-cart-icon">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span data-translate="nav_cart">Savat</span>
-            <span class="bot-badge" style="display:none;">0</span>
-        </a>
-        <a href="#" class="nav-item" id="mobile-login-btn">
+        <a href="#" class="nav-item" onclick="openAuthModal(); return false;">
             <i class="fa-regular fa-user"></i>
-            <span data-translate="nav_login">Kirish</span>
+            <span id="bot-login">Kirish</span>
         </a>
     </nav>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <!-- Модальное окно товара (#product-modal) -->
+    <div class="modal-overlay" id="product-modal-overlay" onclick="closeProductModal()"></div>
+    <div class="modal-box product-modal-box" id="product-modal">
+        <button class="close-modal" onclick="closeProductModal()">&times;</button>
+        <div class="product-modal-content">
+            <div class="product-modal-image">
+                <img id="modal-prod-img" src="" alt="">
+            </div>
+            <div class="product-modal-details">
+                <h3 id="modal-prod-title"></h3>
+                <div class="modal-prod-price" id="modal-prod-price"></div>
+                <div class="modal-prod-weight" id="modal-prod-weight"></div>
+                <div class="modal-prod-specs">
+                    <div class="spec-item">
+                        <span class="spec-label" id="spec-country-label">Ishlab chiqarilgan mamlakat:</span>
+                        <span class="spec-value" id="modal-prod-country"></span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label" id="spec-expiry-label">Yaroqlilik muddati:</span>
+                        <span class="spec-value" id="modal-prod-expiry"></span>
+                    </div>
+                </div>
+                <p class="modal-prod-desc" id="modal-prod-desc"></p>
+                <button class="btn-add-to-cart" id="modal-add-to-cart" onclick="addToCartFromModal()">
+                    <i class="fa-solid fa-cart-plus"></i> <span id="modal-add-btn-text">Savatga qo'shish</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Твой скрипт -->
-    <script src="script.js"></script>
+    <!-- Модальное окно оформления заказа (#checkout-modal) -->
+    <div class="modal-overlay" id="checkout-modal-overlay" onclick="closeCheckoutModal()"></div>
+    <div class="modal-box checkout-modal-box" id="checkout-modal">
+        <button class="close-modal" onclick="closeCheckoutModal()">&times;</button>
+        <h3 id="checkout-modal-title">Buyurtma berish</h3>
+        <form id="checkout-form" onsubmit="submitOrder(event)">
+            <!-- Адрес доставки -->
+            <div class="checkout-section">
+                <h4 id="checkout-addr-title">Yetkazib berish manzili</h4>
+                <div class="checkout-row">
+                    <div class="input-group">
+                        <label for="checkout-street" id="lbl-street">Ko'cha</label>
+                        <input type="text" id="checkout-street" placeholder="Navoiy ko'chasi" required>
+                    </div>
+                    <div class="input-group input-small">
+                        <label for="checkout-house" id="lbl-house">Uy</label>
+                        <input type="text" id="checkout-house" placeholder="15" required>
+                    </div>
+                </div>
+                <div class="checkout-row">
+                    <div class="input-group input-small">
+                        <label for="checkout-entrance" id="lbl-entrance">Pod'ezd</label>
+                        <input type="text" id="checkout-entrance" placeholder="2">
+                    </div>
+                    <div class="input-group input-small">
+                        <label for="checkout-floor" id="lbl-floor">Qavat</label>
+                        <input type="text" id="checkout-floor" placeholder="3">
+                    </div>
+                    <div class="input-group input-small">
+                        <label for="checkout-apartment" id="lbl-apartment">Xonadon</label>
+                        <input type="text" id="checkout-apartment" placeholder="12">
+                    </div>
+                </div>
+                <div class="checkout-row">
+                    <div class="input-group">
+                        <label for="checkout-intercom" id="lbl-intercom">Domofon kodi</label>
+                        <input type="text" id="checkout-intercom" placeholder="1234">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="checkout-comment" id="lbl-comment">Kuryerga izoh</label>
+                    <textarea id="checkout-comment" placeholder="Masalan: 3-pod'ezd, orqa eshik" rows="2"></textarea>
+                </div>
+            </div>
+
+            <!-- Способ оплаты -->
+            <div class="checkout-section">
+                <h4 id="checkout-pay-title">To'lov usuli</h4>
+                <div class="payment-options">
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="card" checked>
+                        <span class="payment-radio"></span>
+                        <span class="payment-label">
+                            <i class="fa-regular fa-credit-card"></i>
+                            <span id="pay-card">Karta (Uzcard/Humo)</span>
+                        </span>
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="cash">
+                        <span class="payment-radio"></span>
+                        <span class="payment-label">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                            <span id="pay-cash">Naqd pul</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Итого -->
+            <div class="checkout-total">
+                <div class="checkout-total-row">
+                    <span id="checkout-total-label">Jami:</span>
+                    <strong id="checkout-final-total">0 so'm</strong>
+                </div>
+                <div class="checkout-total-row checkout-profit-row">
+                    <span>⚡ Sizning foydangiz:</span>
+                    <strong id="checkout-profit">0 so'm</strong>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-checkout-submit" id="btn-confirm-order">
+                <i class="fa-solid fa-check"></i> <span id="confirm-order-text">Buyurtmani tasdiqlash</span>
+            </button>
+        </form>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
