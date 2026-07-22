@@ -1,467 +1,1010 @@
-// --- БАЗА ДАННЫХ ТОВАРОВ (с актуальными ценами на мясо и исправленным Banan) ---
-const productsData = [
-    { id: 1, nameUz: "Mol go'shti (Lahm)", nameRu: "Говядина мякоть", weight: "1 kg", price: 110000, img: "images/beef.png", badge: "Hit", cat: "gosht" },
-    { id: 2, nameUz: "Go'sht mahsulotlari", nameRu: "Мясное ассорти", weight: "1 kg", price: 90000, img: "images/meat.png", badge: "", cat: "gosht" },
-    { id: 3, nameUz: "Qo'y go'shti", nameRu: "Баранина свежая", weight: "1 kg", price: 100000, img: "images/mutton.png", badge: "", cat: "gosht" },
-    { id: 4, nameUz: "Tabiiy sut (Natural)", nameRu: "Молоко натуральное", weight: "1 l", price: 11000, img: "images/naturalmilk.png", badge: "", cat: "sut" },
-    { id: 5, nameUz: "Sut 2%", nameRu: "Молоко 2%", weight: "1 l", price: 12000, img: "images/milk2.png", badge: "-10%", cat: "sut" },
-    { id: 6, nameUz: "Sut 6%", nameRu: "Молоко 6% (Густое)", weight: "1 l", price: 15000, img: "images/milk6.png", badge: "", cat: "sut" },
-    { id: 7, nameUz: "Sut mahsulotlari", nameRu: "Молочные продукты / Творог", weight: "500 g", price: 22000, img: "images/milkproducts.png", badge: "Hit", cat: "sut" },
-    { id: 8, nameUz: "Banan", nameRu: "Бананы спелые", weight: "1 kg", price: 18000, img: "images/banan.png", badge: "-15%", cat: "meva" },
-    { id: 9, nameUz: "Mevalar to'plami", nameRu: "Фруктовое ассорти", weight: "1 kg", price: 35000, img: "images/fruits.png", badge: "", cat: "meva" },
-    { id: 10, nameUz: "Sabzavotlar to'plami", nameRu: "Свежие овощи", weight: "1 kg", price: 15000, img: "images/vegetables.png", badge: "Hit", cat: "meva" },
-    { id: 11, nameUz: "Yangi yopilgan non", nameRu: "Хлеб свежий / Лепешка", weight: "1 dona", price: 3500, img: "images/bread.png", badge: "", cat: "non" },
-    { id: 12, nameUz: "Shirin tort / Pirog", nameRu: "Торт десертный", weight: "1 kg", price: 75000, img: "images/cake.png", badge: "-10%", cat: "shirinlik" },
-    { id: 13, nameUz: "Gazli ichimliklar", nameRu: "Газировка / Сода", weight: "1.5 l", price: 10000, img: "images/soda.png", badge: "", cat: "ichimlik" },
-    { id: 14, nameUz: "Sharbatlar va ichimliklar", nameRu: "Напитки и соки", weight: "1 l", price: 14000, img: "images/drinks.png", badge: "Hit", cat: "ichimlik" },
-    { id: 15, nameUz: "Tuxum (10 dona)", nameRu: "Яйца куриные (10 шт)", weight: "10 dona", price: 16000, img: "images/egg.png", badge: "", cat: "boshqa" },
-    { id: 16, nameUz: "Oliy navli un", nameRu: "Мука высший сорт", weight: "2 kg", price: 22000, img: "images/flour.png", badge: "", cat: "boshqa" },
-    { id: 17, nameUz: "O'simlik yog'i", nameRu: "Подсолнечное масло", weight: "1 l", price: 19000, img: "images/sunflower-oil.png", badge: "Hit", cat: "boshqa" },
-    { id: 18, nameUz: "Foydali yormalar", nameRu: "Крупы / Завтраки", weight: "800 g", price: 18000, img: "images/cereal.png", badge: "", cat: "boshqa" },
-    { id: 19, nameUz: "Konservalangan mahsulotlar", nameRu: "Консервы", weight: "400 g", price: 25000, img: "images/conserve.png", badge: "", cat: "boshqa" },
-    { id: 20, nameUz: "Gigiena va kosmetika", nameRu: "Косметика и гигиена", weight: "1 dona", price: 30000, img: "images/cosmetics.png", badge: "", cat: "boshqa" }
-];
+// public/script.js
+// Firebase через CDN (compat версия)
 
-// --- КАТЕГОРИИ ---
-const categoriesData = [
-    { id: "meva", nameUz: "Mevalar", nameRu: "Фрукты", img: "images/banan.png" },
-    { id: "gosht", nameUz: "Go'sht", nameRu: "Мясо", img: "images/beef.png" },
-    { id: "sut", nameUz: "Sut mahsulotlari", nameRu: "Молочное", img: "images/naturalmilk.png" },
-    { id: "ichimlik", nameUz: "Ichimliklar", nameRu: "Напитки", img: "images/drinks.png" },
-    { id: "shirinlik", nameUz: "Shirinliklar", nameRu: "Сладости", img: "images/cake.png" },
-    { id: "boshqa", nameUz: "Kosmetika / Boshqa", nameRu: "Косметика / Прочее", img: "images/cosmetics.png" }
-];
+// Глобальные переменные Firebase
+let db, auth;
 
-// Словари для перевода (UZ <-> RU)
+// Инициализация Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCdaXL5L1EeeaqF--vLLXxv203bJLe9VMs",
+  authDomain: "abbos-go.firebaseapp.com",
+  projectId: "abbos-go",
+  storageBucket: "abbos-go.firebasestorage.app",
+  messagingSenderId: "456018191223",
+  appId: "1:456018191223:web:9dedf7010c3cc7f0737772",
+};
+
+// Инициализируем Firebase
+try {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    db = firebase.firestore();
+    auth = firebase.auth();
+    console.log("✅ Firebase инициализирован");
+} catch (error) {
+    console.error("❌ Ошибка инициализации Firebase:", error);
+}
+
+// ===========================
+// СЛОВАРЬ ПЕРЕВОДОВ
+// ===========================
 const translations = {
     uz: {
-        loc: "Qorasuv", catBtn: "Katalog", searchPlaceholder: "Mahsulotlarni qidirish...",
-        promo: "Aksiya", about: "Biz haqimizda", contact: "Kontaktlar", login: "Kirish",
-        desktopHeroTitle: "Yangi mahsulotlar to'g'ridan-to'g'ri Abbos bozoridan",
-        desktopHeroSub: "20-40 daqiqada yetkazib berish Qorasuvda",
-        btnOrder: "Buyurtma", btnViewCat: "Katalogni ko'rish",
-        badgeTitle: "Har doim yangi", badgeSub: "Bevosita Abbos Market javonlaridan",
-        trust1Title: "10-20 daqiqa", trust1Sub: "tez yetkazib berish", trust2Sub: "xizmat ko'rsatish reytingi", trust3Sub: "mamnun mijozlar",
-        mobileHeroTitle: "Hafta chegirmalari", mobileHeroBtn: "Ko'rish",
-        catsTitle: "Tavsiya etamiz", productsTitle: "Arzon narxlar kafolati", viewAll: "Barchasini ko'rish >",
-        delivTitle: "10-20 daqiqada yetkazib berish", delivSub: "Tez, oson va qulay!",
-        cartTitle: "Sizning savatingiz", total: "Jami:", checkout: "Buyurtma berish",
-        botHome: "Asosiy", botCat: "Katalog", botFav: "Saralangan", botCart: "Savat", botLogin: "Kirish",
-        toastAdd: "savatga qo'shildi! 🛒", emptyCart: "Savatingiz bo'sh 😔",
-        tabLogin: "Kirish", tabRegister: "Ro'yxatdan o'tish",
-        lblLoginPhone: "Telefon raqam", lblLoginPass: "Parol", btnSubmitLogin: "Tizimga kirish",
-        lblRegName: "Ismingiz", lblRegPhone: "Telefon raqam", lblRegPass: "Parol o'ylab toping", btnSubmitReg: "Ro'yxatdan o'tish",
-        authSuccess: "Tizimga muvaffaqiyatli kirdingiz! 🎉", favEmpty: "Saralangan mahsulotlar yo'q",
-        resetCat: "Barchasini ko'rsatish", locToast: "Yetkazib berish hududi: Qorasuv (20-40 daqiqa) 🚀",
-        aboutTitle: "Biz haqimizda", aboutText: "<b>Abbos Go</b> — Toshkent shahri, Qorasuv hududida eng tez va ishonchli oziq-ovqat yetkazib berish xizmati. Biz mahsulotlarni to'g'ridan-to'g'ri Abbos bozoridan tanlab, 10-20 daqiqada uyizga yetkazamiz!",
-        contactTitle: "Kontaktlar", contactText: "<b>Telefon:</b> +998 (90) 123-45-67<br><b>Telegram:</b> @abbosgo_support<br><b>Manzil:</b> Toshkent sh., Qorasuv-1, Abbos bozori yoni.<br><b>Ish vaqti:</b> 08:00 — 23:00 har kuni."
+        page_title: "Abbos Go — Yetkazib berish xizmati",
+        toast_added: "Mahsulot savatga qo'shildi! 🛒",
+        toast_favorite_added: "Sevimlilarga qo'shildi! ❤️",
+        toast_favorite_removed: "Sevimlilardan o'chirildi",
+        toast_login_success: "Tizimga kirish muvaffaqiyatli! ✅",
+        toast_register_success: "Ro'yxatdan o'tish muvaffaqiyatli! ✅",
+        toast_order_success: "Buyurtma qabul qilindi! ⚡",
+        toast_empty_cart: "Savat bo'sh!",
+        toast_logout_success: "Chiqish muvaffaqiyatli",
+        toast_auth_error: "Xatolik. Qayta urinib ko'ring",
+        toast_password_short: "Parol kamida 6 belgi bo'lishi kerak",
+        toast_user_exists: "Bu raqam allaqachon ro'yxatdan o'tgan",
+        toast_weak_password: "Parol juda oddiy",
+        location: "Qorasuv",
+        catalog_btn: "Katalog",
+        search_placeholder: "Mahsulotlarni qidirish...",
+        nav_promo: "Aksiya",
+        nav_about: "Biz haqimizda",
+        nav_contacts: "Kontaktlar",
+        login_btn: "Kirish",
+        logout_btn: "Chiqish",
+        hero_title: "Yangi mahsulotlar to'g'ridan-to'g'ri Abbos bozoridan",
+        hero_subtitle: "20-40 daqiqada yetkazib berish Qorasuvda",
+        btn_order: "Buyurtma",
+        btn_view_catalog: "Katalogni ko'rish",
+        badge_always_new: "Har doim yangi",
+        badge_abbos_market: "Bevosita Abbos Market",
+        mobile_hero_time: "10-20 daqiqada yetkazib berish",
+        mobile_hero_fast: "tez yetkazib berish",
+        trust_time: "10-20 daqiqa",
+        trust_fast_delivery: "tez yetkazib berish",
+        trust_rating: "xizmat ko'rsatish reytingi",
+        trust_clients: "5000+",
+        trust_happy: "mamnun mijozlar",
+        discounts_title: "Hafta chegirmalari -30% gacha",
+        view_all: "Barchasini ko'rsatish",
+        cat_all: "Barchasi",
+        cat_meat: "Go'sht",
+        cat_vegetables: "Sabzavotlar",
+        cat_fruits: "Mevalar",
+        cat_drinks: "Ichimliklar",
+        cat_bakery: "Nonushta",
+        cat_sweets: "Shirinliklar",
+        cat_cosmetics: "Kosmetika",
+        cat_household: "Maishiy",
+        cat_others: "Boshqa",
+        recommend_title: "Tavsiya etamiz",
+        favorites_title: "Saralangan mahsulotlar",
+        delivery_title: "Arzon narxlar kafolati",
+        delivery_subtitle: "10-20 daqiqada yetkazib berish — Tez, oson va qulay!",
+        cart_title: "Sizning savatingiz",
+        cart_empty: "Savat bo'sh",
+        cart_total: "Jami:",
+        cart_profit: " Sizning foydangiz (6% + 15k):",
+        cart_checkout: "Buyurtma berish",
+        modal_login: "Kirish",
+        modal_register: "Ro'yxatdan o'tish",
+        label_phone: "Telefon raqam",
+        label_password: "Parol",
+        label_name: "Ismingiz",
+        placeholder_phone: "+998 __ ___ __ __",
+        placeholder_password: "••••••••",
+        placeholder_name: "Ismingiz",
+        btn_login_submit: "Tizimga kirish",
+        btn_register_submit: "Ro'yxatdan o'tish",
+        nav_main: "Asosiy",
+        nav_catalog: "Katalog",
+        nav_favorites: "Saralangan",
+        nav_cart: "Savat",
+        nav_login: "Kirish",
+        not_found: "Mahsulotlar topilmadi",
+        favorites_empty: "Sevimli mahsulotlar yo'q. ❤️ tugmasini bosing!"
     },
     ru: {
-        loc: "Карасу", catBtn: "Каталог", searchPlaceholder: "Поиск товаров...",
-        promo: "Акции", about: "О нас", contact: "Контакты", login: "Войти",
-        desktopHeroTitle: "Свежие продукты прямо из Abbos Market",
-        desktopHeroSub: "Доставка за 20-40 минут по Карасу",
-        btnOrder: "Заказать", btnViewCat: "Смотреть Каталог",
-        badgeTitle: "Всегда свежее", badgeSub: "прямо с полок Abbos Market",
-        trust1Title: "10-20 мин", trust1Sub: "быстрая доставка", trust2Sub: "рейтинг сервиса", trust3Sub: "довольных клиентов",
-        mobileHeroTitle: "Скидки недели", mobileHeroBtn: "Смотреть",
-        catsTitle: "Популярные категории", productsTitle: "Популярные товары", viewAll: "Смотреть все >",
-        delivTitle: "Доставка за 10-20 минут", delivSub: "Быстро и удобно!",
-        cartTitle: "Ваша корзина", total: "Итого:", checkout: "Оформить заказ",
-        botHome: "Главная", botCat: "Каталог", botFav: "Избранное", botCart: "Корзина", botLogin: "Войти",
-        toastAdd: "добавлено в корзину! 🛒", emptyCart: "Корзина пуста 😔",
-        tabLogin: "Войти", tabRegister: "Регистрация",
-        lblLoginPhone: "Номер телефона", lblLoginPass: "Пароль", btnSubmitLogin: "Войти в систему",
-        lblRegName: "Ваше имя", lblRegPhone: "Номер телефона", lblRegPass: "Придумайте пароль", btnSubmitReg: "Зарегистрироваться",
-        authSuccess: "Вы успешно вошли в систему! 🎉", favEmpty: "Нет избранных товаров",
-        resetCat: "Показать все", locToast: "Зона доставки: Карасу (20-40 минут) 🚀",
-        aboutTitle: "О нас", aboutText: "<b>Abbos Go</b> — самый быстрый и надежный сервис доставки продуктов в районе Карасу, Ташкент. Мы отбираем свежайшие продукты прямо на рынке Abbos и доставим их к вашему порогу за 10-20 минут!",
-        contactTitle: "Контакты", contactText: "<b>Телефон:</b> +998 (90) 123-45-67<br><b>Telegram:</b> @abbosgo_support<br><b>Адрес:</b> г. Ташкент, Карасу-1, ориентир рынок Abbos.<br><b>Режим работы:</b> 08:00 — 23:00 ежедневно."
+        page_title: "Abbos Go — Служба доставки",
+        toast_added: "Товар добавлен в корзину! 🛒",
+        toast_favorite_added: "Добавлено в избранное! ❤️",
+        toast_favorite_removed: "Удалено из избранного",
+        toast_login_success: "Вход выполнен успешно! ✅",
+        toast_register_success: "Регистрация успешна! ✅",
+        toast_order_success: "Заказ принят! ⚡",
+        toast_empty_cart: "Корзина пуста!",
+        toast_logout_success: "Выход выполнен",
+        toast_auth_error: "Ошибка. Попробуйте снова",
+        toast_password_short: "Пароль должен быть не менее 6 символов",
+        toast_user_exists: "Этот номер уже зарегистрирован",
+        toast_weak_password: "Слишком простой пароль",
+        location: "Карасу",
+        catalog_btn: "Каталог",
+        search_placeholder: "Поиск товаров...",
+        nav_promo: "Акция",
+        nav_about: "О нас",
+        nav_contacts: "Контакты",
+        login_btn: "Вход",
+        logout_btn: "Выйти",
+        hero_title: "Новые товары прямо с рынка Аббос",
+        hero_subtitle: "Доставка за 20-40 минут в Карасу",
+        btn_order: "Заказать",
+        btn_view_catalog: "Смотреть каталог",
+        badge_always_new: "Всегда свежее",
+        badge_abbos_market: "Напрямую Abbos Market",
+        mobile_hero_time: "Доставка за 10-20 минут",
+        mobile_hero_fast: "быстрая доставка",
+        trust_time: "10-20 минут",
+        trust_fast_delivery: "быстрая доставка",
+        trust_rating: "рейтинг обслуживания",
+        trust_clients: "5000+",
+        trust_happy: "довольных клиентов",
+        discounts_title: "Скидки недели до -30%",
+        view_all: "Показать все",
+        cat_all: "Все",
+        cat_meat: "Мясо",
+        cat_vegetables: "Овощи",
+        cat_fruits: "Фрукты",
+        cat_drinks: "Напитки",
+        cat_bakery: "Выпечка",
+        cat_sweets: "Сладости",
+        cat_cosmetics: "Косметика",
+        cat_household: "Бытовые",
+        cat_others: "Другое",
+        recommend_title: "Рекомендуем",
+        favorites_title: "Избранные товары",
+        delivery_title: "Гарантия низких цен",
+        delivery_subtitle: "Доставка за 10-20 минут — Быстро, легко и удобно!",
+        cart_title: "Ваша корзина",
+        cart_empty: "Корзина пуста",
+        cart_total: "Итого:",
+        cart_profit: "⚡ Ваша прибыль (6% + 15к):",
+        cart_checkout: "Оформить заказ",
+        modal_login: "Вход",
+        modal_register: "Регистрация",
+        label_phone: "Номер телефона",
+        label_password: "Пароль",
+        label_name: "Ваше имя",
+        placeholder_phone: "+998 __ ___ __ __",
+        placeholder_password: "••••••••",
+        placeholder_name: "Ваше имя",
+        btn_login_submit: "Войти",
+        btn_register_submit: "Зарегистрироваться",
+        nav_main: "Главная",
+        nav_catalog: "Каталог",
+        nav_favorites: "Избранное",
+        nav_cart: "Корзина",
+        nav_login: "Вход",
+        not_found: "Товары не найдены",
+        favorites_empty: "Нет избранных товаров. Нажмите ❤️!"
     }
 };
 
-let currentLang = 'uz';
-let cart = [];
-let favorites = [];
-let activeCategory = "";
-let activeFilter = ""; // "promo" или "fav"
+// ===========================
+// СОСТОЯНИЕ
+// ===========================
+let allProducts = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+let currentLang = localStorage.getItem('lang') || 'uz';
+let currentCategory = 'all';
+let showFavoritesOnly = false;
+let currentUser = null;
 
-// 1. Отрисовка категорий
-function renderCategories() {
-    const grid = document.getElementById('categories-grid');
+const categoryByIndex = [
+    'all', 'meat_department', 'vegetables', 'fruits', 'drinks',
+    'bakery', 'sweets', 'cosmetics', 'household', 'others'
+];
+
+// ===========================
+// ПЕРЕВОД ИНТЕРФЕЙСА
+// ===========================
+function translateInterface() {
+    const t = translations[currentLang];
+    
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (t[key]) {
+            el.textContent = t[key];
+        }
+    });
+    
+    document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-translate-placeholder');
+        if (t[key]) {
+            el.placeholder = t[key];
+        }
+    });
+    
+    const title = document.querySelector('[data-translate="page_title"]');
+    if (title) {
+        document.title = t.page_title;
+    }
+    
+    renderProducts();
+    renderCart();
+}
+
+// ===========================
+// ЗАГРУЗКА ТОВАРОВ
+// ===========================
+async function loadProducts() {
+    try {
+        const querySnapshot = await db.collection("abbos").get();
+        allProducts = [];
+        querySnapshot.forEach((doc) => {
+            allProducts.push({ id: doc.id, ...doc.data() });
+        });
+        console.log(`✅ Загружено товаров: ${allProducts.length}`);
+        renderProducts();
+    } catch (error) {
+        console.error("❌ Ошибка Firebase:", error);
+        const grid = document.querySelector('.products-grid');
+        if (grid) grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#ef4444;">Ошибка загрузки</p>';
+    }
+}
+
+// ===========================
+// ОТРИСОВКА ТОВАРОВ
+// ===========================
+function renderProducts() {
+    const grid = document.querySelector('.products-grid');
     if (!grid) return;
     grid.innerHTML = '';
-    categoriesData.forEach(cat => {
-        const name = currentLang === 'uz' ? cat.nameUz : cat.nameRu;
-        const isActive = activeCategory === cat.id ? 'active' : '';
-        grid.innerHTML += `
-            <div class="cat-card ${isActive}" onclick="filterByCategory('${cat.id}')">
-                <img src="${cat.img}" alt="${name}">
-                <span>${name}</span>
-            </div>
-        `;
-    });
-}
 
-// 2. Отрисовка товаров
-function renderProducts(filterText = "") {
-    const grid = document.getElementById('products-grid');
-    const titleEl = document.getElementById('products-title');
-    if (!grid) return;
-    grid.innerHTML = '';
-    
-    if (activeFilter === 'promo') {
-        titleEl.innerText = currentLang === 'uz' ? "Aksiya va chegirmalar 🔥" : "Акции и скидки 🔥";
-    } else if (activeFilter === 'fav') {
-        titleEl.innerText = currentLang === 'uz' ? "Saralangan mahsulotlar ❤️" : "Избранные товары ❤️";
-    } else if (activeCategory) {
-        const catObj = categoriesData.find(c => c.id === activeCategory);
-        titleEl.innerText = currentLang === 'uz' ? catObj.nameUz : catObj.nameRu;
-    } else {
-        titleEl.innerText = translations[currentLang].productsTitle;
+    let filtered = currentCategory === 'all'
+        ? allProducts
+        : allProducts.filter(p => p.catalog === currentCategory);
+
+    if (showFavoritesOnly) {
+        filtered = filtered.filter(p => favorites.includes(p.id));
     }
 
-    const filtered = productsData.filter(p => {
-        const name = currentLang === 'uz' ? p.nameUz : p.nameRu;
-        const matchesText = name.toLowerCase().includes(filterText.toLowerCase());
-        const matchesCat = activeCategory ? p.cat === activeCategory : true;
-        const matchesPromo = activeFilter === 'promo' ? p.badge !== "" : true;
-        const matchesFav = activeFilter === 'fav' ? favorites.includes(p.id) : true;
-        return matchesText && matchesCat && matchesPromo && matchesFav;
-    });
+    const searchInput = document.querySelector('.search-box input');
+    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
-    if (filtered.length === 0) {
-        const emptyMsg = activeFilter === 'fav' ? translations[currentLang].favEmpty : (currentLang === 'uz' ? "Mahsulot topilmadi" : "Товар не найден");
-        grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#888; padding: 30px; font-size: 16px;">${emptyMsg}</p>`;
-        return;
-    }
-
-    filtered.forEach(prod => {
-        const name = currentLang === 'uz' ? prod.nameUz : prod.nameRu;
-        const badgeHtml = prod.badge ? `<div class="badge-discount ${prod.badge === 'Hit' ? 'badge-hit' : ''}">${prod.badge}</div>` : '';
-        const isFav = favorites.includes(prod.id);
-        
-        // ИСПРАВЛЕНИЕ: В функцию addToCart теперь передается только чистый prod.id (без кавычек и текста)
-        grid.innerHTML += `
-            <div class="product-card">
-                ${badgeHtml}
-                <button class="btn-fav ${isFav ? 'active' : ''}" onclick="toggleFav(${prod.id}); event.stopPropagation();">
-                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                </button>
-                <div class="prod-img-box">
-                    <img src="${prod.img}" alt="${name}">
-                </div>
-                <div>
-                    <div class="prod-title">${name}</div>
-                    <div class="prod-weight">${prod.weight}</div>
-                    <div class="prod-bottom">
-                        <span class="prod-price">${prod.price.toLocaleString()} so'm</span>
-                        <button class="btn-add" onclick="addToCart(${prod.id})">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-}
-
-// 3. Добавление в корзину (БЕЗОПАСНАЯ ФУНКЦИЯ ПО ID)
-function addToCart(id) {
-    const prod = productsData.find(p => p.id === id);
-    if (!prod) return;
-    
-    // Сохраняем в корзину только ID товара, чтобы название всегда соответствовало текущему языку
-    cart.push({ id: prod.id });
-    updateCartUI();
-    
-    const name = currentLang === 'uz' ? prod.nameUz : prod.nameRu;
-    showToast(name + " " + translations[currentLang].toastAdd);
-}
-
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCartUI();
-}
-
-// 4. Обновление интерфейса корзины
-function updateCartUI() {
-    const countEl = document.getElementById('cart-count');
-    const botCountEl = document.getElementById('bot-cart-count');
-    if (countEl) countEl.innerText = cart.length;
-    if (botCountEl) botCountEl.innerText = cart.length;
-
-    const cartItemsBox = document.getElementById('cart-items');
-    if (!cartItemsBox) return;
-    cartItemsBox.innerHTML = '';
-    
-    let total = 0;
-
-    if (cart.length === 0) {
-        cartItemsBox.innerHTML = `<p style="text-align:center; color:#888; margin-top:40px;">${translations[currentLang].emptyCart}</p>`;
-    } else {
-        cart.forEach((item, index) => {
-            const prod = productsData.find(p => p.id === item.id);
-            if (!prod) return;
-            
-            const name = currentLang === 'uz' ? prod.nameUz : prod.nameRu;
-            total += prod.price;
-            
-            cartItemsBox.innerHTML += `
-                <div class="cart-item">
-                    <img src="${prod.img}" alt="">
-                    <div class="cart-item-info">
-                        <div class="cart-item-title">${name}</div>
-                        <div class="cart-item-price">${prod.price.toLocaleString()} so'm</div>
-                    </div>
-                    <button class="btn-remove" onclick="removeFromCart(${index})"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `;
+    if (searchTerm) {
+        filtered = filtered.filter(p => {
+            const name = (currentLang === 'uz' ? p.nameUz : p.nameRu) || '';
+            return name.toLowerCase().includes(searchTerm);
         });
     }
 
-    const totalEl = document.getElementById('cart-total');
-    if (totalEl) totalEl.innerText = total.toLocaleString() + " so'm";
-    
-    let myProfit = 0;
-    if (total > 0) {
-        myProfit = (total * 0.06) + 15000;
-    }
-    const profitEl = document.getElementById('my-profit');
-    if (profitEl) profitEl.innerText = Math.round(myProfit).toLocaleString() + " so'm 🔥";
-}
-
-// 5. Управление корзиной
-function toggleCart() {
-    const drawer = document.getElementById('cart-drawer');
-    const overlay = document.getElementById('cart-overlay');
-    if (drawer) drawer.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('open');
-}
-
-// 6. Уведомление Toast
-function showToast(text) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.innerHTML = text;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2800);
-}
-
-// 7. Поиск, фильтрация по категориям и сброс
-const searchInput = document.getElementById('search-input');
-if (searchInput) searchInput.addEventListener('input', (e) => renderProducts(e.target.value));
-
-const mobileSearchInput = document.getElementById('mobile-search-input');
-if (mobileSearchInput) mobileSearchInput.addEventListener('input', (e) => renderProducts(e.target.value));
-
-function filterByCategory(catId) {
-    activeCategory = catId;
-    activeFilter = "";
-    document.getElementById('reset-cat-link').style.display = 'inline';
-    updateNavActive('cat');
-    renderCategories();
-    renderProducts();
-    scrollToSection('products-section');
-}
-
-function filterByPromo() {
-    activeCategory = "";
-    activeFilter = "promo";
-    document.getElementById('reset-cat-link').style.display = 'inline';
-    renderCategories();
-    renderProducts();
-    scrollToSection('products-section');
-}
-
-function filterByFavorites() {
-    activeCategory = "";
-    activeFilter = "fav";
-    document.getElementById('reset-cat-link').style.display = 'inline';
-    updateNavActive('fav');
-    renderCategories();
-    renderProducts();
-    scrollToSection('products-section');
-}
-
-function goToHome() {
-    activeCategory = "";
-    activeFilter = "";
-    if (searchInput) searchInput.value = "";
-    if (mobileSearchInput) mobileSearchInput.value = "";
-    document.getElementById('reset-cat-link').style.display = 'none';
-    updateNavActive('home');
-    renderCategories();
-    renderProducts();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function scrollToSection(id) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-        if (id === 'categories-section') updateNavActive('cat');
-    }
-}
-
-function updateNavActive(type) {
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    if (type === 'home' && document.getElementById('nav-btn-home')) document.getElementById('nav-btn-home').classList.add('active');
-    if (type === 'cat' && document.getElementById('nav-btn-cat')) document.getElementById('nav-btn-cat').classList.add('active');
-    if (type === 'fav' && document.getElementById('nav-btn-fav')) document.getElementById('nav-btn-fav').classList.add('active');
-}
-
-// 8. Система избранного
-function toggleFav(id) {
-    const idx = favorites.indexOf(id);
-    if (idx === -1) {
-        favorites.push(id);
-        showToast("❤️ Saralanganlarga qo'shildi / Добавлено в избранное");
-    } else {
-        favorites.splice(idx, 1);
-    }
-    renderProducts();
-}
-
-// 9. Модальные окна: Авторизация и Регистрация
-function openAuthModal() {
-    document.getElementById('auth-modal').classList.add('open');
-    document.getElementById('auth-modal-overlay').classList.add('open');
-}
-function closeAuthModal() {
-    document.getElementById('auth-modal').classList.remove('open');
-    document.getElementById('auth-modal-overlay').classList.remove('open');
-}
-function switchAuthTab(tab) {
-    const loginForm = document.getElementById('form-login');
-    const regForm = document.getElementById('form-register');
-    const loginTab = document.getElementById('tab-login');
-    const regTab = document.getElementById('tab-register');
-
-    if (tab === 'login') {
-        loginForm.style.display = 'block';
-        regForm.style.display = 'none';
-        loginTab.classList.add('active');
-        regTab.classList.remove('active');
-    } else {
-        loginForm.style.display = 'none';
-        regForm.style.display = 'block';
-        loginTab.classList.remove('active');
-        regTab.classList.add('active');
-    }
-}
-function handleAuth(event, type) {
-    event.preventDefault();
-    closeAuthModal();
-    let name = "Mijoz";
-    if (type === 'register') {
-        const inputName = document.getElementById('reg-name-input').value;
-        if (inputName) name = inputName;
-    }
-    showToast(translations[currentLang].authSuccess);
-    if (document.getElementById('login-text')) document.getElementById('login-text').innerText = name;
-    if (document.getElementById('bot-login')) document.getElementById('bot-login').innerText = name;
-}
-
-// 10. Модальное окно информации (О нас / Контакты)
-function openInfoModal(type) {
     const t = translations[currentLang];
-    const titleEl = document.getElementById('info-modal-title');
-    const contentEl = document.getElementById('info-modal-content');
-    
-    if (type === 'about') {
-        titleEl.innerText = t.aboutTitle;
-        contentEl.innerHTML = t.aboutText;
-    } else {
-        titleEl.innerText = t.contactTitle;
-        contentEl.innerHTML = t.contactText;
+
+    if (filtered.length === 0) {
+        const msg = showFavoritesOnly ? t.favorites_empty : t.not_found;
+        grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:40px;color:#64748b;">${msg}</p>`;
+        return;
     }
-    document.getElementById('info-modal').classList.add('open');
-    document.getElementById('info-modal-overlay').classList.add('open');
-}
-function closeInfoModal() {
-    document.getElementById('info-modal').classList.remove('open');
-    document.getElementById('info-modal-overlay').classList.remove('open');
+
+    filtered.forEach(product => {
+        const name = currentLang === 'uz' ? (product.nameUz || '') : (product.nameRu || '');
+        const price = product.price || 0;
+        
+        const image = product.img 
+            ? `images/${product.img}` 
+            : `images/${product.id}.png`;
+        
+        const isFav = favorites.includes(product.id);
+
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+            <button class="btn-fav ${isFav ? 'active' : ''}" data-id="${product.id}">
+                ${isFav ? '❤️' : '🤍'}
+            </button>
+            <div class="prod-img-box">
+                <img src="${image}" alt="${name}" loading="lazy" onerror="this.src='images/placeholder.png'">
+            </div>
+            <div class="prod-title">${name}</div>
+            <div class="prod-weight">ID: ${product.id}</div>
+            <div class="prod-bottom">
+                <div class="prod-price">${price.toLocaleString()} so'm</div>
+                <button class="btn-add" data-id="${product.id}">+</button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    attachProductListeners();
 }
 
-// 11. Оформление заказа
-function alertOrder() {
-    if (cart.length === 0) return alert(currentLang === 'uz' ? "Savat bo'sh!" : "Корзина пуста!");
-    const total = document.getElementById('cart-total') ? document.getElementById('cart-total').innerText : "0";
-    const profit = document.getElementById('my-profit') ? document.getElementById('my-profit').innerText : "0";
-    alert(`🎉 BUYURTMA QABUL QILINDI / ЗАКАЗ ОФОРМЛЕН!\n\nMijoz to'laydi / Сумма клиенту: ${total}\n⚡ Sizning sof foydangiz / Ваш чистый заработок: ${profit}`);
-    cart = [];
-    updateCartUI();
-    toggleCart();
+function attachProductListeners() {
+    document.querySelectorAll('.btn-add').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            addToCart(e.currentTarget.dataset.id);
+            showToast(translations[currentLang].toast_added);
+        });
+    });
+
+    document.querySelectorAll('.btn-fav').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            toggleFavorite(e.currentTarget.dataset.id);
+        });
+    });
 }
 
-// 12. Система смены языка
+// ===========================
+// КОРЗИНА
+// ===========================
+function addToCart(productId) {
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return;
+
+    const existing = cart.find(i => i.id === productId);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        const image = product.img 
+            ? `images/${product.img}` 
+            : `images/${product.id}.png`;
+        
+        cart.push({
+            id: product.id,
+            name: currentLang === 'uz' ? product.nameUz : product.nameRu,
+            image: image,
+            price: product.price,
+            quantity: 1
+        });
+    }
+    saveCart();
+    renderCart();
+}
+
+function removeFromCart(productId) {
+    cart = cart.filter(i => i.id !== productId);
+    saveCart();
+    renderCart();
+}
+
+function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function renderCart() {
+    const cartItems = document.querySelector('.cart-items');
+    const totalRow = document.querySelector('.total-row');
+    const profitCalc = document.querySelector('.profit-calc');
+    const cartBadge = document.querySelector('.cart-badge, .bot-badge');
+    const t = translations[currentLang];
+
+    if (cartBadge) {
+        const count = cart.reduce((s, i) => s + i.quantity, 0);
+        cartBadge.textContent = count;
+        cartBadge.style.display = count > 0 ? 'flex' : 'none';
+    }
+
+    if (!cartItems) return;
+
+    if (cart.length === 0) {
+        cartItems.innerHTML = `<p style="text-align:center;color:#64748b;padding:40px 0;">${t.cart_empty}</p>`;
+        if (totalRow) totalRow.innerHTML = `<span>${t.cart_total}</span><span>0 so'm</span>`;
+        if (profitCalc) profitCalc.innerHTML = `<span>${t.cart_profit}</span><span>0 so'm</span>`;
+        return;
+    }
+
+    cartItems.innerHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.png'">
+            <div class="cart-item-info">
+                <div class="cart-item-title">${item.name}</div>
+                <div class="cart-item-price">${item.price.toLocaleString()} so'm × ${item.quantity}</div>
+            </div>
+            <button class="btn-remove" data-id="${item.id}">✕</button>
+        `;
+        cartItems.appendChild(div);
+    });
+
+    if (totalRow) {
+        totalRow.innerHTML = `
+            <span>${t.cart_total}</span>
+            <span style="color:var(--green-primary);font-weight:800;">${total.toLocaleString()} so'm</span>
+        `;
+    }
+
+    if (profitCalc) {
+        const profit = Math.round(total * 0.06) + 15000;
+        profitCalc.innerHTML = `
+            <span>${t.cart_profit}</span>
+            <span>${profit.toLocaleString()} so'm</span>
+        `;
+    }
+
+    document.querySelectorAll('.cart-item .btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            removeFromCart(e.currentTarget.dataset.id);
+        });
+    });
+}
+
+// ===========================
+// ИЗБРАННОЕ
+// ===========================
+function toggleFavorite(productId) {
+    const t = translations[currentLang];
+    if (favorites.includes(productId)) {
+        favorites = favorites.filter(id => id !== productId);
+        showToast(t.toast_favorite_removed);
+    } else {
+        favorites.push(productId);
+        showToast(t.toast_favorite_added);
+    }
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    renderProducts();
+}
+
+// ===========================
+// КАТЕГОРИИ
+// ===========================
+function setupCategories() {
+    const catCards = document.querySelectorAll('.cat-card');
+    catCards.forEach((card, index) => {
+        card.addEventListener('click', () => {
+            if (showFavoritesOnly) {
+                showFavoritesOnly = false;
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            }
+            
+            catCards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            currentCategory = card.dataset.category || categoryByIndex[index] || 'all';
+            renderProducts();
+        });
+    });
+}
+
+// ===========================
+// ЯЗЫК
+// ===========================
 function setLang(lang) {
     currentLang = lang;
-    const t = translations[lang];
+    localStorage.setItem('lang', lang);
     
-    document.querySelectorAll('.lang-item').forEach(btn => btn.classList.remove('active'));
-    const langBtn = document.getElementById('lang-' + lang);
-    if (langBtn) langBtn.classList.add('active');
-
-    if (document.getElementById('loc-text')) document.getElementById('loc-text').innerText = t.loc;
-    if (document.getElementById('cat-btn-text')) document.getElementById('cat-btn-text').innerText = t.catBtn;
-    if (document.getElementById('search-input')) document.getElementById('search-input').placeholder = t.searchPlaceholder;
-    if (document.getElementById('mobile-search-input')) document.getElementById('mobile-search-input').placeholder = t.searchPlaceholder;
-    if (document.getElementById('nav-promo')) document.getElementById('nav-promo').innerText = t.promo;
-    if (document.getElementById('nav-about')) document.getElementById('nav-about').innerText = t.about;
-    if (document.getElementById('nav-contact')) document.getElementById('nav-contact').innerText = t.contact;
-    if (document.getElementById('login-text') && (document.getElementById('login-text').innerText === "Kirish" || document.getElementById('login-text').innerText === "Войти")) {
-        document.getElementById('login-text').innerText = t.login;
-    }
-
-    if (document.getElementById('desktop-hero-title')) document.getElementById('desktop-hero-title').innerText = t.desktopHeroTitle;
-    if (document.getElementById('desktop-hero-sub')) document.getElementById('desktop-hero-sub').innerText = t.desktopHeroSub;
-    if (document.getElementById('btn-order')) document.getElementById('btn-order').innerText = t.btnOrder;
-    if (document.getElementById('btn-view-cat')) document.getElementById('btn-view-cat').innerText = t.btnViewCat;
-    if (document.getElementById('badge-title')) document.getElementById('badge-title').innerText = t.badgeTitle;
-    if (document.getElementById('badge-sub')) document.getElementById('badge-sub').innerText = t.badgeSub;
-    if (document.getElementById('trust-1-title')) document.getElementById('trust-1-title').innerText = t.trust1Title;
-    if (document.getElementById('trust-1-sub')) document.getElementById('trust-1-sub').innerText = t.trust1Sub;
-    if (document.getElementById('trust-2-sub')) document.getElementById('trust-2-sub').innerText = t.trust2Sub;
-    if (document.getElementById('trust-3-sub')) document.getElementById('trust-3-sub').innerText = t.trust3Sub;
+    const langButtons = document.querySelectorAll('.lang-item');
+    langButtons.forEach(btn => {
+        btn.classList.remove('active');
+        const btnLang = btn.getAttribute('data-lang');
+        if (btnLang === lang) {
+            btn.classList.add('active');
+        }
+    });
     
-    if (document.getElementById('mobile-hero-title')) document.getElementById('mobile-hero-title').innerHTML = t.mobileHeroTitle + '<br><span>-30% gacha</span>';
-    if (document.getElementById('mobile-hero-btn')) document.getElementById('mobile-hero-btn').innerText = t.mobileHeroBtn;
-    
-    if (document.getElementById('cats-title')) document.getElementById('cats-title').innerText = t.catsTitle;
-    if (document.getElementById('view-all-link')) document.getElementById('view-all-link').innerText = t.viewAll;
-    if (document.getElementById('reset-cat-link')) document.getElementById('reset-cat-link').innerText = t.resetCat;
-    if (document.getElementById('deliv-title')) document.getElementById('deliv-title').innerText = t.delivTitle;
-    if (document.getElementById('deliv-sub')) document.getElementById('deliv-sub').innerText = t.delivSub;
-
-    if (document.getElementById('cart-drawer-title')) document.getElementById('cart-drawer-title').innerText = t.cartTitle;
-    if (document.getElementById('total-text')) document.getElementById('total-text').innerText = t.total;
-    if (document.getElementById('btn-checkout')) document.getElementById('btn-checkout').innerText = t.checkout;
-    if (document.getElementById('bot-home')) document.getElementById('bot-home').innerText = t.botHome;
-    if (document.getElementById('bot-cat')) document.getElementById('bot-cat').innerText = t.botCat;
-    if (document.getElementById('bot-fav')) document.getElementById('bot-fav').innerText = t.botFav;
-    if (document.getElementById('bot-cart')) document.getElementById('bot-cart').innerText = t.botCart;
-    if (document.getElementById('bot-login') && (document.getElementById('bot-login').innerText === "Kirish" || document.getElementById('bot-login').innerText === "Войти")) {
-        document.getElementById('bot-login').innerText = t.botLogin;
-    }
-
-    if (document.getElementById('tab-login')) document.getElementById('tab-login').innerText = t.tabLogin;
-    if (document.getElementById('tab-register')) document.getElementById('tab-register').innerText = t.tabRegister;
-    if (document.getElementById('lbl-login-phone')) document.getElementById('lbl-login-phone').innerText = t.lblLoginPhone;
-    if (document.getElementById('lbl-login-pass')) document.getElementById('lbl-login-pass').innerText = t.lblLoginPass;
-    if (document.getElementById('btn-submit-login')) document.getElementById('btn-submit-login').innerText = t.btnSubmitLogin;
-    if (document.getElementById('lbl-reg-name')) document.getElementById('lbl-reg-name').innerText = t.lblRegName;
-    if (document.getElementById('lbl-reg-phone')) document.getElementById('lbl-reg-phone').innerText = t.lblRegPhone;
-    if (document.getElementById('lbl-reg-pass')) document.getElementById('lbl-reg-pass').innerText = t.lblRegPass;
-    if (document.getElementById('btn-submit-reg')) document.getElementById('btn-submit-reg').innerText = t.btnSubmitReg;
-
-    renderCategories();
-    renderProducts();
-    updateCartUI();
+    translateInterface();
 }
 
-// Запуск при открытии страницы
-renderCategories();
-renderProducts();
-updateCartUI();
+function setupLanguage() {
+    const langButtons = document.querySelectorAll('.lang-item');
+    langButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.getAttribute('data-lang');
+            setLang(lang);
+        });
+    });
+}
+
+// ===========================
+// ПОИСК
+// ===========================
+function setupSearch() {
+    const inputs = document.querySelectorAll('.search-box input, .mobile-search input');
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            renderProducts();
+        });
+    });
+}
+
+// ===========================
+// TOAST
+// ===========================
+function showToast(message) {
+    let toast = document.querySelector('.toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ===========================
+// КОРЗИНА
+// ===========================
+function toggleCart(show) {
+    const overlay = document.querySelector('.cart-overlay');
+    const drawer = document.querySelector('.cart-drawer');
+    
+    if (show === true) {
+        if (overlay) overlay.classList.add('open');
+        if (drawer) drawer.classList.add('open');
+    } else if (show === false) {
+        if (overlay) overlay.classList.remove('open');
+        if (drawer) drawer.classList.remove('open');
+    } else {
+        if (overlay && drawer) {
+            if (drawer.classList.contains('open')) {
+                overlay.classList.remove('open');
+                drawer.classList.remove('open');
+            } else {
+                overlay.classList.add('open');
+                drawer.classList.add('open');
+            }
+        }
+    }
+}
+
+function setupCartDrawer() {
+    const overlay = document.querySelector('.cart-overlay');
+    const drawer = document.querySelector('.cart-drawer');
+    const openBtns = document.querySelectorAll('.cart-btn, .bot-cart-icon');
+    const closeBtn = document.querySelector('.close-cart');
+
+    openBtns.forEach(btn => btn.addEventListener('click', () => toggleCart(true)));
+    if (closeBtn) closeBtn.addEventListener('click', () => toggleCart(false));
+    if (overlay) overlay.addEventListener('click', () => toggleCart(false));
+}
+
+// ===========================
+// РЕГИСТРАЦИЯ И ВХОД - С МЕНЮ ПРОФИЛЯ
+// ===========================
+function setupAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    const modalBox = modal?.querySelector('.modal-box');
+    const openBtns = document.querySelectorAll('#open-login-modal, #mobile-login-btn');
+    const closeBtn = document.getElementById('close-auth-modal');
+    const tabs = document.querySelectorAll('.tab-btn');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    const openModal = () => {
+        if (modal) modal.classList.add('open');
+        if (modalBox) modalBox.classList.add('open');
+    };
+    
+    const closeModal = () => {
+        if (modal) modal.classList.remove('open');
+        if (modalBox) modalBox.classList.remove('open');
+    };
+
+    openBtns.forEach(btn => btn.addEventListener('click', openModal));
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (modal) modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            if (tab.dataset.tab === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            }
+        });
+    });
+
+    // ВХОД
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const phone = loginForm.querySelector('input[type="tel"]').value.trim();
+        const password = loginForm.querySelector('input[type="password"]').value;
+        const t = translations[currentLang];
+
+        if (!phone || !password) {
+            showToast(t.toast_auth_error);
+            return;
+        }
+
+        try {
+            const email = phone.replace(/\s/g, '') + '@abbosgo.uz';
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            
+            // Получаем данные пользователя из Firestore ВКЛЮЧАЯ ПАРОЛЬ
+            const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+            
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                // Сохраняем пароль в localStorage для быстрого доступа
+                localStorage.setItem('userPassword', userData.password || password);
+                
+                showToast(t.toast_login_success);
+                showProfileMenu(userData);
+            } else {
+                showToast(t.toast_auth_error);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            showToast(t.toast_auth_error);
+        }
+    });
+
+    // РЕГИСТРАЦИЯ
+    registerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = registerForm.querySelector('input[type="text"]').value.trim();
+        const phone = registerForm.querySelector('input[type="tel"]').value.trim();
+        const password = registerForm.querySelector('input[type="password"]').value;
+        const t = translations[currentLang];
+
+        if (!name || !phone || !password) {
+            showToast(t.toast_auth_error);
+            return;
+        }
+
+        if (password.length < 6) {
+            showToast(t.toast_password_short);
+            return;
+        }
+
+        try {
+            const email = phone.replace(/\s/g, '') + '@abbosgo.uz';
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            
+            // Сохраняем данные ВКЛЮЧАЯ ПАРОЛЬ в Firestore
+            await db.collection('users').doc(userCredential.user.uid).set({
+                name: name,
+                phone: phone,
+                email: email,
+                password: password, // ← ПАРОЛЬ СОХРАНЯЕТСЯ
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Сохраняем пароль в localStorage
+            localStorage.setItem('userPassword', password);
+
+            showToast(t.toast_register_success);
+            showProfileMenu({ name, phone, password });
+        } catch (error) {
+            console.error('Register error:', error);
+            if (error.code === 'auth/email-already-in-use') {
+                showToast(t.toast_user_exists);
+            } else if (error.code === 'auth/weak-password') {
+                showToast(t.toast_weak_password);
+            } else {
+                showToast(t.toast_auth_error);
+            }
+        }
+    });
+}
+
+function showProfileMenu(userData) {
+    const modalBox = document.querySelector('.modal-box');
+    const t = translations[currentLang];
+    
+    // Получаем пароль из userData или из localStorage
+    const userPassword = userData.password || localStorage.getItem('userPassword') || '-';
+    
+    modalBox.innerHTML = `
+        <button class="close-modal" id="close-profile-modal">×</button>
+        <div class="profile-menu">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <h2>${userData.name || 'Пользователь'}</h2>
+            </div>
+            
+            <div class="profile-info">
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fa-regular fa-user"></i>
+                        <span>${t.label_name}</span>
+                    </div>
+                    <div class="info-value">${userData.name || '-'}</div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>${t.label_phone}</span>
+                    </div>
+                    <div class="info-value">${userData.phone || '-'}</div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>${t.label_password}</span>
+                    </div>
+                    <div class="info-value" style="word-break: break-all; font-size: 14px; color: var(--green-primary); background: var(--green-light); padding: 6px 12px; border-radius: 8px;">
+                        ${userPassword}
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-logout-profile" id="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                ${t.logout_btn || 'Выйти'}
+            </button>
+        </div>
+    `;
+    
+    // Обработчик закрытия
+    document.getElementById('close-profile-modal').addEventListener('click', () => {
+        const modal = document.getElementById('auth-modal');
+        modal.classList.remove('open');
+        modalBox.classList.remove('open');
+        setTimeout(() => restoreAuthModal(), 300);
+    });
+    
+    // Обработчик выхода
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+        try {
+            await auth.signOut();
+            showToast(t.toast_logout_success);
+            const modal = document.getElementById('auth-modal');
+            modal.classList.remove('open');
+            modalBox.classList.remove('open');
+            setTimeout(() => restoreAuthModal(), 300);
+            updateLoginUI(null);
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    });
+}
+// Восстановление оригинального модального окна
+function restoreAuthModal() {
+    const modalBox = document.querySelector('.modal-box');
+    modalBox.innerHTML = `
+        <button class="close-modal" id="close-auth-modal">×</button>
+        <div class="modal-tabs">
+            <button class="tab-btn active" data-tab="login" data-translate="modal_login">Kirish</button>
+            <button class="tab-btn" data-tab="register" data-translate="modal_register">Ro'yxatdan o'tish</button>
+        </div>
+
+        <!-- Форма входа -->
+        <form id="login-form">
+            <div class="input-group">
+                <label data-translate="label_phone">Telefon raqam</label>
+                <input type="tel" data-translate-placeholder="placeholder_phone" placeholder="+998 __ ___ __ __" required>
+            </div>
+            <div class="input-group">
+                <label data-translate="label_password">Parol</label>
+                <input type="password" data-translate-placeholder="placeholder_password" placeholder="" required>
+            </div>
+            <button type="submit" class="btn-auth-submit" data-translate="btn_login_submit">Tizimga kirish</button>
+        </form>
+
+        <!-- Форма регистрации -->
+        <form id="register-form" style="display:none;">
+            <div class="input-group">
+                <label data-translate="label_name">Ismingiz</label>
+                <input type="text" data-translate-placeholder="placeholder_name" placeholder="Ismingiz" required>
+            </div>
+            <div class="input-group">
+                <label data-translate="label_phone">Telefon raqam</label>
+                <input type="tel" data-translate-placeholder="placeholder_phone" placeholder="+998 __ ___ __ __" required>
+            </div>
+            <div class="input-group">
+                <label data-translate="label_new_password">Parol o'ylab toping</label>
+                <input type="password" data-translate-placeholder="placeholder_password" placeholder="" required>
+            </div>
+            <button type="submit" class="btn-auth-submit" data-translate="btn_register_submit">Ro'yxatdan o'tish</button>
+        </form>
+    `;
+    
+    // Перезапускаем обработчики
+    setupAuthModal();
+    translateInterface();
+}
+
+// Обновление UI после входа/выхода
+function updateLoginUI(user) {
+    const loginBtns = document.querySelectorAll('#open-login-modal, #mobile-login-btn');
+    const t = translations[currentLang];
+    
+    loginBtns.forEach(btn => {
+        if (user) {
+            btn.innerHTML = `<i class="fa-regular fa-user"></i> ${user.name || 'User'}`;
+            btn.onclick = function(e) {
+                e.preventDefault();
+                // При клике на имя - показываем профиль
+                const modal = document.getElementById('auth-modal');
+                const modalBox = modal?.querySelector('.modal-box');
+                if (modal && modalBox) {
+                    modal.classList.add('open');
+                    modalBox.classList.add('open');
+                    showProfileMenu(user);
+                }
+            };
+        } else {
+            btn.innerHTML = `<i class="fa-regular fa-user"></i> ${t.login_btn}`;
+            btn.onclick = function(e) {
+                e.preventDefault();
+                const modal = document.getElementById('auth-modal');
+                const modalBox = modal?.querySelector('.modal-box');
+                if (modal && modalBox) {
+                    modal.classList.add('open');
+                    modalBox.classList.add('open');
+                }
+            };
+        }
+    });
+}
+
+// Проверка состояния авторизации
+function setupAuthState() {
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    localStorage.setItem('userName', userData.name);
+                    localStorage.setItem('userPhone', userData.phone);
+                    updateLoginUI(userData);
+                } else {
+                    updateLoginUI({ name: user.email.split('@')[0] });
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                updateLoginUI({ name: user.email.split('@')[0] });
+            }
+        } else {
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userPhone');
+            updateLoginUI(null);
+        }
+    });
+}
+// ===========================
+// ОФОРМЛЕНИЕ ЗАКАЗА
+// ===========================
+function setupCheckout() {
+    const btn = document.querySelector('.btn-checkout');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        const t = translations[currentLang];
+        if (cart.length === 0) {
+            showToast(t.toast_empty_cart);
+            return;
+        }
+        showToast(t.toast_order_success);
+        cart = [];
+        saveCart();
+        renderCart();
+        toggleCart(false);
+    });
+}
+
+// ===========================
+// МОБИЛЬНАЯ НАВИГАЦИЯ
+// ===========================
+function setupMobileNav() {
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            navItems.forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+            
+            const text = item.querySelector('span')?.getAttribute('data-translate') || '';
+            
+            if (text === 'nav_favorites') {
+                showFavoritesOnly = true;
+                currentCategory = 'all';
+                document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+                renderProducts();
+                
+                const productsSection = document.querySelector('.products-grid')?.closest('.section-container');
+                if (productsSection) {
+                    productsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (text === 'nav_main') {
+                showFavoritesOnly = false;
+                currentCategory = 'all';
+                document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+                document.querySelector('.cat-card')?.classList.add('active');
+                renderProducts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (text === 'nav_catalog') {
+                showFavoritesOnly = false;
+                const categoriesSection = document.querySelector('.categories-grid')?.closest('.section-container');
+                if (categoriesSection) {
+                    categoriesSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (text === 'nav_cart') {
+                toggleCart(true);
+            }
+        });
+    });
+}
+
+// ===========================
+// СТИЛИ ДЛЯ МЕНЮ ПОЛЬЗОВАТЕЛЯ
+// ===========================
+function addUserMenuStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .user-menu {
+            position: fixed;
+            width: 300px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+            z-index: 10000;
+            animation: userMenuAppear 0.3s ease;
+        }
+        @keyframes userMenuAppear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-menu-header {
+            padding: 15px 20px;
+            background: var(--green-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-menu-content {
+            padding: 20px;
+        }
+        .user-info {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .user-info div {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            color: var(--text-muted);
+        }
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// ===========================
+// ЗАПУСК
+// ===========================
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        addUserMenuStyles();
+        setupCategories();
+        setupLanguage();
+        setupSearch();
+        setupCartDrawer();
+        setupCheckout();
+        setupAuthModal();
+        setupAuthState();
+        setupMobileNav();
+        translateInterface();
+        renderCart();
+        loadProducts();
+    } catch (error) {
+        console.error("❌ Ошибка инициализации:", error);
+    }
+});
